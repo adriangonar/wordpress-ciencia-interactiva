@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordPress como plataforma de divulgación científica — Adrián González Naranjo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;800&display=swap');
+
+:root {
+  --bg:      #07080f;
+  --card:    #0f1020;
+  --card2:   #131427;
+  --wp:      #3858e9;
+  --wp-l:    #5b78f5;
+  --accent:  #7c6dfa;
+  --green:   #00e5b4;
+  --pink:    #f06292;
+  --orange:  #ffa040;
+  --text:    #dde0f0;
+  --muted:   #626580;
+  --border:  rgba(124,109,250,.18);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  overflow: hidden;
+  height: 100vh; width: 100vw;
+}
+
+/* grid texture */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(124,109,250,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,109,250,.03) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+/* ── SLIDES ── */
+.slide {
+  display:none; position:absolute; inset:0; z-index:1;
+  padding: 2.6rem 4.4rem;
+  flex-direction:column; justify-content:center;
+  animation: sIn .4s cubic-bezier(.16,1,.3,1);
+}
+.slide.active { display:flex; }
+@keyframes sIn {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── PROGRESS ── */
+#pbar {
+  position:fixed; top:0; left:0; height:2px; z-index:300;
+  background: linear-gradient(90deg, var(--wp), var(--accent), var(--green));
+  background-size:200%; animation:shimmer 4s linear infinite;
+  transition: width .4s cubic-bezier(.16,1,.3,1);
+  box-shadow: 0 0 10px rgba(56,88,233,.6);
+}
+@keyframes shimmer{ 0%{background-position:0%} 100%{background-position:200%} }
+
+#pctr {
+  position:fixed; bottom:1.5rem; right:2rem; z-index:300;
+  font-family:'JetBrains Mono',monospace; font-size:.68rem;
+  color: var(--muted); letter-spacing:.1em;
+}
+
+/* ── NAV ── */
+.nb {
+  position:fixed; bottom:1.2rem; z-index:300;
+  width:36px; height:36px; border-radius:9px; cursor:pointer;
+  background:rgba(15,16,32,.85); backdrop-filter:blur(8px);
+  border:1px solid var(--border); color:var(--text); font-size:.95rem;
+  transition: all .15s ease;
+}
+.nb:hover { background:var(--wp); border-color:var(--wp); box-shadow:0 0 14px rgba(56,88,233,.4); }
+#np { left:calc(50% + 8px); }
+#pp { left:calc(50% - 46px); }
+
+/* ── TYPOGRAPHY ── */
+.tag {
+  font-family:'JetBrains Mono',monospace; font-size:.66rem;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--green);
+  display:flex; align-items:center; gap:.5rem; margin-bottom:.85rem;
+}
+.tag::before { content:''; display:block; width:16px; height:1px; background:var(--green); }
+
+h1 {
+  font-size: clamp(2.4rem,5.2vw,4rem);
+  font-weight:800; line-height:1.06; letter-spacing:-.025em;
+  background: linear-gradient(135deg, #fff 0%, #c8c0ff 45%, var(--wp-l) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; margin-bottom:1.1rem;
+}
+h2 {
+  font-size:clamp(1.65rem,3vw,2.5rem);
+  font-weight:700; color:#fff; letter-spacing:-.02em;
+  line-height:1.15; margin-bottom:1rem;
+}
+h3 {
+  font-size:.97rem; font-weight:600; color:var(--green);
+  margin-bottom:.5rem; letter-spacing:.01em;
+}
+p, li { font-size:clamp(.88rem,1.35vw,1.02rem); line-height:1.75; font-weight:300; }
+.lead {
+  font-size:clamp(1rem,1.7vw,1.22rem); color:var(--muted);
+  line-height:1.65; font-weight:300; max-width:58ch; margin-bottom:1.6rem;
+}
+strong { color:var(--pink); font-weight:600; }
+em { color:var(--green); font-style:normal; font-weight:500; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--card); border:1px solid rgba(255,255,255,.055);
+  border-radius:13px; padding:1.25rem 1.4rem; position:relative; overflow:hidden;
+}
+.card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+}
+.card.wp  { border-color:rgba(56,88,233,.45);  }
+.card.wp::after  { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left,rgba(56,88,233,.08),transparent 60%); pointer-events:none; }
+.card.acc { border-color:rgba(124,109,250,.4); }
+.card.acc::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left,rgba(124,109,250,.07),transparent 60%); pointer-events:none; }
+.card.grn { border-color:rgba(0,229,180,.35);  }
+.card.grn::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left,rgba(0,229,180,.06),transparent 60%); pointer-events:none; }
+.card.pnk { border-color:rgba(240,98,146,.35); }
+.card.pnk::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left,rgba(240,98,146,.06),transparent 60%); pointer-events:none; }
+.card.org { border-color:rgba(255,160,64,.35);  }
+.card.org::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at top left,rgba(255,160,64,.06),transparent 60%); pointer-events:none; }
+
+/* ── GRIDS ── */
+.g2  { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; margin-top:1rem; }
+.g3  { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1rem; }
+.g4  { display:grid; grid-template-columns:repeat(4,1fr); gap:.9rem; margin-top:1rem; }
+.col2  { display:grid; grid-template-columns:1.1fr .9fr; gap:2.6rem; align-items:center; }
+.col2e { display:grid; grid-template-columns:1fr 1fr; gap:2.4rem; align-items:start; }
+
+/* ── CODE ── */
+pre {
+  font-family:'JetBrains Mono',monospace;
+  background:#05060e; border:1px solid rgba(56,88,233,.22);
+  border-radius:11px; padding:1.1rem 1.3rem;
+  font-size:.75rem; line-height:1.8; color:#c8d0e8;
+  position:relative; overflow-x:auto;
+}
+pre .lang {
+  position:absolute; top:.45rem; right:.8rem;
+  font-size:.58rem; color:var(--muted); letter-spacing:.1em;
+}
+.kw { color:#c792ea; } .fn { color:#82aaff; }
+.cm { color:#4a5568; font-style:italic; } .num { color:#f78c6c; }
+.op { color:var(--green); } .str { color:#f1fa8c; }
+
+.math {
+  font-family:'JetBrains Mono',monospace; display:block;
+  background:rgba(0,229,180,.06); border:1px solid rgba(0,229,180,.2);
+  border-radius:7px; padding:.6rem 1rem; font-size:.82rem;
+  color:var(--green); margin:.55rem 0;
+}
+
+/* ── UI ELEMENTS ── */
+.hbox {
+  background:rgba(56,88,233,.08); border-left:3px solid var(--wp);
+  padding:.95rem 1.3rem; border-radius:0 10px 10px 0;
+  margin-top:1rem; font-size:.95rem; line-height:1.7; font-weight:300;
+}
+.hbox.grn { background:rgba(0,229,180,.07); border-left-color:var(--green); }
+.hbox.pnk { background:rgba(240,98,146,.07); border-left-color:var(--pink); }
+
+.tip {
+  background:rgba(255,160,64,.07); border:1px solid rgba(255,160,64,.22);
+  border-radius:9px; padding:.8rem 1.1rem;
+  font-size:.86rem; line-height:1.65; font-weight:300;
+}
+.tip::before { content:'💡 '; }
+
+.badge {
+  display:inline-flex; align-items:center; gap:.45rem;
+  background:rgba(56,88,233,.12); border:1px solid rgba(56,88,233,.35);
+  color:rgba(150,168,255,.9); font-family:'JetBrains Mono',monospace;
+  font-size:.66rem; letter-spacing:.1em; padding:.32rem .8rem;
+  border-radius:100px; margin-bottom:1.7rem; width:fit-content;
+}
+.badge::before { content:'◈'; color:var(--green); }
+
+.pill {
+  display:inline-flex; align-items:center; gap:.3rem;
+  border-radius:100px; padding:.25rem .8rem; font-size:.76rem;
+  font-family:'JetBrains Mono',monospace; letter-spacing:.04em; margin:.2rem;
+}
+.pill.wp  { background:rgba(56,88,233,.12);  border:1px solid rgba(56,88,233,.3);  color:rgba(150,168,255,.9); }
+.pill.grn { background:rgba(0,229,180,.1);   border:1px solid rgba(0,229,180,.3);  color:rgba(0,229,180,.9); }
+.pill.pnk { background:rgba(240,98,146,.1);  border:1px solid rgba(240,98,146,.3); color:rgba(240,98,146,.9); }
+.pill.org { background:rgba(255,160,64,.1);  border:1px solid rgba(255,160,64,.3); color:rgba(255,160,64,.9); }
+
+/* ── MISC ── */
+ul { list-style:none; display:flex; flex-direction:column; gap:.42rem; }
+ul li { padding-left:1.05rem; position:relative; }
+ul li::before { content:'›'; position:absolute; left:0; color:var(--wp-l); font-weight:700; }
+
+.ico { font-size:1.9rem; display:block; margin-bottom:.55rem; }
+
+.divider { width:40px; height:2px; border-radius:2px; margin:.7rem 0 1.1rem;
+  background:linear-gradient(90deg,var(--wp),var(--green)); }
+
+.author { display:flex; align-items:center; gap:.75rem; margin-top:1.8rem; }
+.ava {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--wp),var(--accent));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:.88rem; color:#fff;
+  box-shadow:0 0 12px rgba(56,88,233,.4);
+}
+.aname { font-size:.92rem; font-weight:600; color:#fff; }
+.arole { font-size:.74rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+
+/* ── CANVAS ── */
+canvas {
+  border-radius:13px; border:1px solid rgba(124,109,250,.15);
+  background:#04050d; display:block;
+  box-shadow:0 0 36px rgba(124,109,250,.07), inset 0 0 24px rgba(0,0,0,.4);
+}
+
+/* ── COVER ── */
+.cover {
+  background:
+    radial-gradient(ellipse 65% 55% at 75% 30%, rgba(56,88,233,.14) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 45% at 15% 80%, rgba(0,229,180,.07) 0%, transparent 55%),
+    var(--bg);
+}
+
+/* ── WP LOGO ── */
+.wp-logo {
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg, #3858e9, #6882ff);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; font-weight:900; color:#fff;
+  font-family:'Georgia',serif; margin-bottom:1.2rem;
+  box-shadow:0 0 24px rgba(56,88,233,.45);
+}
+
+/* Lagrange points */
+.lpt {
+  background:var(--card); border:1px solid rgba(255,255,255,.05);
+  border-radius:11px; padding:1rem; text-align:center;
+}
+.lpt .ln { font-family:'JetBrains Mono',monospace; font-size:1.3rem; font-weight:700; }
+.lpt .ld { font-size:.72rem; color:var(--muted); margin-top:.3rem; line-height:1.4; }
+.lpt .ls { font-size:.7rem; margin-top:.45rem; font-weight:600; }
+.lpt.u { border-color:rgba(240,98,146,.38); } .lpt.u .ln,.lpt.u .ls { color:var(--pink); }
+.lpt.s { border-color:rgba(0,229,180,.38); }  .lpt.s .ln,.lpt.s .ls { color:var(--green); }
+
+/* step list */
+.steps { display:flex; flex-direction:column; gap:.8rem; margin-top:.9rem; }
+.step  { display:flex; gap:1rem; align-items:flex-start; }
+.snum  {
+  width:26px; height:26px; min-width:26px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--wp),var(--accent));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-size:.68rem; font-weight:700; color:#fff;
+  box-shadow:0 0 8px rgba(56,88,233,.35);
+}
+
+/* plugin chips */
+.plugin {
+  display:inline-flex; align-items:center; gap:.5rem;
+  background:rgba(56,88,233,.1); border:1px solid rgba(56,88,233,.3);
+  border-radius:8px; padding:.45rem .9rem;
+  font-family:'JetBrains Mono',monospace; font-size:.74rem; color:rgba(150,168,255,.9);
+  margin:.25rem;
+}
+.plugin::before { content:'⊞'; color:var(--wp-l); }
+
+/* preset buttons (sim slide) */
+.preset-btn {
+  background:rgba(124,109,250,.12); border:1px solid rgba(124,109,250,.3);
+  color:rgba(196,188,255,.85); border-radius:8px; padding:.35rem .65rem;
+  font-size:.74rem; cursor:pointer; font-family:'JetBrains Mono',monospace;
+  letter-spacing:.03em; transition: all .15s ease; white-space:nowrap;
+}
+.preset-btn:hover { background:rgba(124,109,250,.28); border-color:rgba(124,109,250,.6); }
+.preset-btn.active-preset { background:rgba(0,229,180,.15); border-color:rgba(0,229,180,.55); color:#00e5b4; }
+</style>
+</head>
+<body>
+
+<div id="pbar"></div>
+<div id="pctr"></div>
+<button class="nb" id="pp">←</button>
+<button class="nb" id="np">→</button>
+
+
+<!-- ═══════════════════════════════════════════
+     S1  PORTADA
+════════════════════════════════════════════ -->
+<div class="slide cover active" id="s1">
+  <span class="badge">WordPress Valladolid · 20/05/2026</span>
+  <div class="tag">Divulgación científica + WordPress</div>
+  <h1>WordPress puede<br>publicar física espacial<br>interactiva</h1>
+  <p class="lead">Y os lo voy a demostrar en vivo con uno de los problemas matemáticos más difíciles de la historia.</p>
+  <div style="display:flex;gap:.55rem;flex-wrap:wrap;">
+    <span class="pill wp">🌐 WordPress como plataforma</span>
+    <span class="pill grn">💻 Simulación en el navegador</span>
+    <span class="pill pnk">🚀 Sin plugins de pago</span>
+  </div>
+  <div class="author">
+    <div class="ava">AG</div>
+    <div>
+      <div class="aname">Adrián González Naranjo</div>
+      <div class="arole">Matemático · Informático</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S2  EL PROBLEMA DE HOY
+════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="tag">De qué va esto</div>
+  <h2>¿Qué significa publicar<br>ciencia interactiva en WordPress?</h2>
+  <div class="divider"></div>
+  <div class="g2" style="margin-top:.8rem;">
+    <div>
+      <div class="card wp" style="margin-bottom:1rem;">
+        <span class="ico">😩</span>
+        <h3>Lo que suele pasar</h3>
+        <ul>
+          <li>Artículo con texto e imágenes estáticas</li>
+          <li>El lector lee y se va</li>
+          <li>El contenido científico queda inaccesible</li>
+          <li>Se necesitan plugins de pago o iframes externos</li>
+        </ul>
+      </div>
+      <div class="tip">La mayoría de la divulgación científica en web es un PDF disfrazado de página HTML.</div>
+    </div>
+    <div class="card grn">
+      <span class="ico">🚀</span>
+      <h3>Lo que vamos a ver hoy</h3>
+      <ul>
+        <li>Una simulación física real corriendo en el navegador</li>
+        <li>Cero plugins. Cero servicios externos. Cero coste</li>
+        <li>Un bloque HTML personalizado de WordPress</li>
+        <li>El lector interactúa, no lee</li>
+      </ul>
+      <div class="hbox grn" style="margin-top:1rem; font-size:.88rem;">
+        El ejemplo: <strong>El Problema de los Tres Cuerpos</strong>. Física espacial real. NASA-grade.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S3  QUIÉN SOY
+════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="tag">Quién soy</div>
+  <h2>Matemático que acabó<br>hablando en WordPress</h2>
+  <div class="divider"></div>
+  <div class="g2" style="margin-top:.8rem;">
+    <div class="card acc">
+      <span class="ico">📐</span>
+      <h3>El origen: matemáticas</h3>
+      <ul>
+        <li>TFG sobre mecánica celestial (Univ. Extremadura)</li>
+        <li>Ecuaciones diferenciales y sistemas caóticos</li>
+        <li>Simulaciones numéricas en Python y Sage</li>
+      </ul>
+      <div class="tip" style="margin-top:.9rem; font-size:.83rem;">
+        Pasé meses calculando trayectorias de satélites. Nadie podía verlas excepto yo.
+      </div>
+    </div>
+    <div class="card wp">
+      <span class="ico">💡</span>
+      <h3>El descubrimiento: WordPress</h3>
+      <ul>
+        <li>Un bloque HTML en WordPress puede ejecutar JavaScript</li>
+        <li>JavaScript puede resolver ecuaciones diferenciales</li>
+        <li>Luego cualquier simulación científica puede vivir en una entrada de blog</li>
+      </ul>
+      <div class="hbox" style="margin-top:.9rem; font-size:.88rem;">
+        <strong>Conclusión:</strong> WordPress no es solo para blogs y tiendas. Es una plataforma de divulgación científica brutal.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S4  EL PROBLEMA (contenido que vamos a publicar)
+════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="tag">El contenido que vamos a publicar</div>
+  <h2>El Problema de los Tres Cuerpos:<br>de qué trata</h2>
+  <div class="col2">
+    <div>
+      <p style="margin-bottom:.9rem;">Tres objetos en el espacio que se atraen por gravedad. Pregunta: ¿puedes predecir exactamente dónde estará cada uno en el futuro?</p>
+      <div class="hbox" style="margin-top:.8rem;">
+        Con <strong>2 cuerpos</strong>: sí. Kepler lo resolvió en 1609. Fórmula exacta.<br><br>
+        Con <strong>3 cuerpos</strong>: en general, <strong>no existe solución</strong>. El sistema es caótico.
+      </div>
+      <div class="tip" style="margin-top:.9rem;">
+        Eso sí: podemos <em>simularlo</em> numéricamente con un ordenador. Y esa simulación corre perfectamente en un navegador.
+      </div>
+    </div>
+    <canvas id="co" width="320" height="280"></canvas>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S5  LA FÍSICA (lo justo)
+════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="tag">La física — lo justo para entender el código</div>
+  <h2>Tres datos clave<br>(y olvidáis el resto)</h2>
+  <div class="g3" style="margin-top:1.1rem;">
+    <div class="card wp">
+      <span class="ico">🌍🌕</span>
+      <h3>1 — Dos cuerpos fijos</h3>
+      <p style="font-size:.88rem;">Tierra y Luna se mueven en círculos. Los tratamos como fijos en un sistema que gira con ellos. Solo nos importa el satélite.</p>
+    </div>
+    <div class="card grn">
+      <span class="ico">🔢</span>
+      <h3>2 — Un solo parámetro</h3>
+      <p style="font-size:.88rem;">Todo el sistema depende de <em>μ = masa_Luna / masa_total ≈ 0.0123</em>. Un número controla toda la física.</p>
+      <code class="math" style="font-size:.75rem; margin-top:.6rem;">mu = 0.012277471</code>
+    </div>
+    <div class="card pnk">
+      <span class="ico">📍</span>
+      <h3>3 — Cinco puntos especiales</h3>
+      <p style="font-size:.88rem;">Existen 5 puntos donde las fuerzas se cancelan: los Puntos de Lagrange. El James Webb orbita en uno de ellos.</p>
+    </div>
+  </div>
+  <div class="hbox" style="margin-top:1.1rem;">
+    No necesitáis entender la física para publicarla en WordPress. Solo necesitáis el código que la simula. Y ese código son <strong>30 líneas de JavaScript</strong>.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S6  LOS PUNTOS DE LAGRANGE
+════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="tag">Los puntos de equilibrio</div>
+  <h2>Los 5 Puntos de Lagrange:<br>por qué importan</h2>
+  <p style="margin-bottom:1rem;">Son los 5 puntos donde un satélite puede quedarse "quieto" respecto a la Tierra y la Luna. NASA los usa para aparcar telescopios y sondas.</p>
+  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:.8rem;">
+    <div class="lpt u"><div class="ln">L1</div><div class="ld">Entre Tierra y Luna</div><div class="ls">⚠ Inestable</div></div>
+    <div class="lpt u"><div class="ln">L2</div><div class="ld">Más allá de la Luna</div><div class="ls">⚠ Inestable</div></div>
+    <div class="lpt u"><div class="ln">L3</div><div class="ld">Lado opuesto</div><div class="ls">⚠ Inestable</div></div>
+    <div class="lpt s"><div class="ln">L4</div><div class="ld">Triángulo equilátero</div><div class="ls">✓ Estable</div></div>
+    <div class="lpt s"><div class="ln">L5</div><div class="ld">Triángulo equilátero</div><div class="ls">✓ Estable</div></div>
+  </div>
+  <div class="g2" style="margin-top:.95rem;">
+    <div class="tip" style="margin-top:0;">
+      El <strong>telescopio James Webb</strong> orbita en L2 del sistema Sol-Tierra desde 2022. Sin estas matemáticas, no estaría ahí.
+    </div>
+    <div class="hbox grn" style="margin-top:0;">
+      <em>Este es exactamente el tipo de dato que hace que un artículo de divulgación en WordPress sea memorable.</em> No la fórmula — el contexto real.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S7  LAS REGIONES DE HILL
+════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="tag">La visualización principal</div>
+  <h2>¿Dónde puede ir el satélite?<br>Las Regiones de Hill</h2>
+  <div class="col2">
+    <div>
+      <p style="margin-bottom:.9rem;">Fijada la energía inicial del satélite, hay zonas del espacio que <strong>físicamente no puede alcanzar</strong>. A esas zonas las llamamos Regiones de Hill.</p>
+      <p style="margin-bottom:.9rem;">Cuando la energía sube, se abren "puertas" en los puntos de Lagrange. Primero L1 (paso entre Tierra y Luna), luego L2 (escape al espacio).</p>
+      <div class="hbox" style="margin-top:.8rem;">
+        <strong>Esta imagen</strong> —generada píxel a píxel por JavaScript en el navegador— es la visualización central de nuestro artículo WordPress. Y se renderiza en menos de 1 segundo.
+      </div>
+      <div class="tip" style="margin-top:.85rem; font-size:.83rem;">
+        Las zonas oscuras son las prohibidas. Los puntos de colores son los Lagrange. Todo calculado en tiempo real.
+      </div>
+    </div>
+    <canvas id="ch" width="320" height="290"></canvas>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S8  EL CÓDIGO — FOCO EN JS/WP
+════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="tag">El núcleo técnico</div>
+  <h2>30 líneas de JavaScript<br>= física espacial en WordPress</h2>
+  <div class="col2e">
+    <div>
+      <p style="margin-bottom:.8rem; font-size:.92rem;">Esta función es el corazón de la simulación. Calcula dónde va el satélite en cada instante. Cabe en cualquier bloque HTML de WordPress.</p>
+      <pre><span class="lang">javascript</span><span class="cm">// Estado del satélite: [x, y, vel_x, vel_y]</span>
+<span class="kw">function</span> <span class="fn">derivadas</span>(x, y, vx, vy, mu) {
+  <span class="kw">const</span> r1 <span class="op">=</span> Math.<span class="fn">sqrt</span>((x<span class="op">+</span>mu)<span class="op">**</span><span class="num">2</span> <span class="op">+</span> y<span class="op">**</span><span class="num">2</span>);
+  <span class="kw">const</span> r2 <span class="op">=</span> Math.<span class="fn">sqrt</span>((x<span class="op">-</span><span class="num">1</span><span class="op">+</span>mu)<span class="op">**</span><span class="num">2</span> <span class="op">+</span> y<span class="op">**</span><span class="num">2</span>);
+
+  <span class="cm">// Aceleración = suma de fuerzas gravitatorias</span>
+  <span class="kw">const</span> ax <span class="op">=</span> x <span class="op">+</span> <span class="num">2</span><span class="op">*</span>vy
+    <span class="op">-</span> (<span class="num">1</span><span class="op">-</span>mu)<span class="op">*</span>(x<span class="op">+</span>mu)<span class="op">/</span>r1<span class="op">**</span><span class="num">3</span>
+    <span class="op">-</span> mu<span class="op">*</span>(x<span class="op">-</span><span class="num">1</span><span class="op">+</span>mu)<span class="op">/</span>r2<span class="op">**</span><span class="num">3</span>;
+  <span class="kw">const</span> ay <span class="op">=</span> y <span class="op">-</span> <span class="num">2</span><span class="op">*</span>vx
+    <span class="op">-</span> (<span class="num">1</span><span class="op">-</span>mu)<span class="op">*</span>y<span class="op">/</span>r1<span class="op">**</span><span class="num">3</span>
+    <span class="op">-</span> mu<span class="op">*</span>y<span class="op">/</span>r2<span class="op">**</span><span class="num">3</span>;
+
+  <span class="kw">return</span> [vx, vy, ax, ay];
+}</pre>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.95rem;">
+      <div class="card wp">
+        <h3>¿Cómo entra esto en WordPress?</h3>
+        <p style="font-size:.86rem;">Bloque HTML personalizado → pegas este código dentro de un <code style="color:var(--green)">&lt;script&gt;</code> junto a un <code style="color:var(--green)">&lt;canvas&gt;</code>. Listo.</p>
+      </div>
+      <div class="card grn">
+        <h3>¿Por qué funciona?</h3>
+        <p style="font-size:.86rem;">WordPress no toca el contenido de los bloques HTML. El navegador ejecuta el script directamente. Sin intermediarios.</p>
+      </div>
+      <div class="card pnk">
+        <h3>¿Qué hace RK4?</h3>
+        <p style="font-size:.86rem;">Es el algoritmo que avanza la simulación. Como un bucle muy inteligente con dt pequeño. Ya viene en la cabeza de cualquier matemático computacional.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S9  DEMO EN VIVO
+════════════════════════════════════════════ -->
+<div class="slide" id="s9" style="padding:1.4rem 2rem;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;flex-wrap:wrap;gap:.6rem;">
+    <div>
+      <div class="tag" style="margin-bottom:.2rem;">Demo en vivo</div>
+      <h2 style="font-size:1.7rem;margin-bottom:0;">La simulación en vivo</h2>
+    </div>
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.1em;">ESCENARIO →</span>
+      <button class="preset-btn active-preset" data-preset="tierra"  title="Órbita terrestre">🌍 Tierra</button>
+      <button class="preset-btn"               data-preset="artemis" title="Trayectoria tipo Artemis">🚀 Artemis</button>
+      <button class="preset-btn"               data-preset="webb"    title="Entorno del punto L2">🔭 Webb</button>
+      <button class="preset-btn"               data-preset="caos"    title="Caos determinista">🌀 Caos</button>
+      <button id="btn-reset" style="
+        background:rgba(56,88,233,.15);border:1px solid rgba(56,88,233,.4);
+        color:rgba(150,168,255,.9);border-radius:8px;padding:.38rem .8rem;
+        font-family:'JetBrains Mono',monospace;font-size:.72rem;cursor:pointer;
+        letter-spacing:.06em;transition:background .15s;">↺ RESET</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:1.2rem;align-items:stretch;height:calc(100% - 5rem);">
+    <canvas id="cs" style="flex:1;min-width:0;height:100%;border-radius:14px;
+      border:1px solid rgba(124,109,250,.18);background:#04050d;
+      box-shadow:0 0 50px rgba(124,109,250,.09),inset 0 0 30px rgba(0,0,0,.5);"></canvas>
+
+    <div style="width:230px;display:flex;flex-direction:column;gap:.7rem;justify-content:center;">
+      <div class="card wp" style="padding:1rem 1.1rem;">
+        <h3 style="font-size:.88rem;">📖 Escenario actual</h3>
+        <p id="preset-desc" style="font-size:.8rem;margin-top:.5rem;color:var(--muted);line-height:1.5;">
+          C > C(L1): el satélite orbita la Tierra. La zona prohibida le impide llegar a la Luna.
+        </p>
+      </div>
+      <div class="card grn" style="padding:1rem 1.1rem;">
+        <h3 style="font-size:.88rem;">🌀 Prueba: Artemis vs Caos</h3>
+        <p style="font-size:.8rem;margin-top:.3rem;color:var(--muted);">
+          Pulsa <strong style="color:var(--green)">Artemis</strong> y observa. Luego pulsa <strong style="color:var(--green)">Caos</strong>. Diferencia inicial de 0.005 — trayectoria completamente distinta. Eso es el caos.
+        </p>
+      </div>
+      <div class="card pnk" style="padding:1rem 1.1rem;">
+        <h3 style="font-size:.88rem;">⚡ Energía (Jacobi)</h3>
+        <div id="jacobi-val" style="font-family:'JetBrains Mono',monospace;margin-top:.5rem;line-height:1.6;">C = —</div>
+        <p style="font-size:.7rem;margin-top:.4rem;color:var(--muted);">C(L1) = 3.189 · C(L2) = 3.173</p>
+      </div>
+      <div style="text-align:center;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:.08em;">RK4 · 60fps · sin dependencias</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S10  APLICACIONES REALES (contexto para el artículo)
+════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="tag">El contexto que convierte lectores en fans</div>
+  <h2>Por qué este tema<br>engancha a cualquiera</h2>
+  <div class="g3">
+    <div class="card wp">
+      <span class="ico">🔭</span>
+      <h3>James Webb — L2</h3>
+      <p style="font-size:.86rem;">El telescopio más potente del mundo orbita en L2 del sistema Sol-Tierra desde 2022. La posición fue calculada con exactamente este tipo de simulaciones.</p>
+    </div>
+    <div class="card grn">
+      <span class="ico">🚀</span>
+      <h3>Autopistas gravitatorias</h3>
+      <p style="font-size:.86rem;">Las sondas usan los cuellos de L1 y L2 para viajar entre planetas con un <strong>90% menos de combustible</strong>. Sin fórmula exacta, con simulación numérica.</p>
+    </div>
+    <div class="card pnk">
+      <span class="ico">🪐</span>
+      <h3>Asteroides Troyanos</h3>
+      <p style="font-size:.86rem;">7.000+ asteroides llevan miles de millones de años estables en L4 y L5 de Júpiter. La naturaleza también optimiza rutas.</p>
+    </div>
+  </div>
+  <div class="hbox grn" style="margin-top:1.1rem;">
+    Este es el tipo de contenido que un lector <strong>comparte</strong>. No porque entienda las ecuaciones, sino porque puede <em>jugar</em> con la simulación y ver el James Webb en contexto.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S11  CÓMO MONTARLO EN WORDPRESS
+════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="tag">Paso a paso</div>
+  <h2>Cómo publicar esto<br>en WordPress hoy</h2>
+  <div class="col2e" style="margin-top:.9rem;">
+    <div>
+      <div class="steps">
+        <div class="step"><div class="snum">1</div><p style="font-size:.9rem;"><strong>Nueva entrada</strong> → editor de bloques → añadir bloque <em>HTML personalizado</em></p></div>
+        <div class="step"><div class="snum">2</div><p style="font-size:.9rem;">Pegar el código: <code style="color:var(--green); font-size:.82rem;">&lt;canvas&gt;</code> + <code style="color:var(--green); font-size:.82rem;">&lt;script&gt;</code> con la simulación. Sin shortcodes, sin plugins.</p></div>
+        <div class="step"><div class="snum">3</div><p style="font-size:.9rem;">Para las fórmulas matemáticas del artículo, activar el plugin <em>MathJax</em> o <em>KaTeX</em>. Gratis. Oficial.</p></div>
+        <div class="step"><div class="snum">4</div><p style="font-size:.9rem;">Previsualizar. La simulación corre directamente en el editor. Publicar.</p></div>
+        <div class="step"><div class="snum">5</div><p style="font-size:.9rem;">Opcional: añadir controles <code style="color:var(--green); font-size:.82rem;">&lt;input range&gt;</code> para que el lector varíe parámetros en tiempo real.</p></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.9rem;">
+      <div style="margin-bottom:.3rem;"><span style="font-size:.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;">PLUGINS ÚTILES</span></div>
+      <span class="plugin" style="display:block;">MathJax — fórmulas LaTeX en el frontend</span>
+      <span class="plugin" style="display:block;">KaTeX for WordPress — más rápido que MathJax</span>
+      <span class="plugin" style="display:block;">Code Block Pro — mostrar código bonito</span>
+      <span class="plugin" style="display:block;">Simple Custom CSS &amp; JS — si necesitas algo global</span>
+      <div class="tip" style="margin-top:.5rem; font-size:.82rem;">
+        Para interactividad avanzada: la API REST de WordPress + datos científicos de la NASA (todas las APIs son públicas y gratuitas).
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S12  MÁS ALLÁ — POSIBILIDADES
+════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="tag">El modelo se puede replicar</div>
+  <h2>Cualquier simulación científica<br>puede vivir en WordPress</h2>
+  <div class="g4">
+    <div class="card wp">
+      <span class="ico">🧬</span>
+      <h3>Biología</h3>
+      <p style="font-size:.84rem;">Modelos de propagación de epidemias, redes neuronales, evolución. Mismo enfoque: JS + Canvas + bloque HTML.</p>
+    </div>
+    <div class="card grn">
+      <span class="ico">⚡</span>
+      <h3>Física</h3>
+      <p style="font-size:.84rem;">Oscilaciones, circuitos eléctricos, óptica geométrica, relatividad especial. Todo simulable en el navegador.</p>
+    </div>
+    <div class="card pnk">
+      <span class="ico">📊</span>
+      <h3>Estadística</h3>
+      <p style="font-size:.84rem;">Visualizaciones de distribuciones, simulaciones Monte Carlo, teorema central del límite. Con la librería D3.js si se necesita más potencia.</p>
+    </div>
+    <div class="card org">
+      <span class="ico">🌍</span>
+      <h3>Geografía / Clima</h3>
+      <p style="font-size:.84rem;">APIs de datos climáticos en abierto + visualización con Canvas o Leaflet. WordPress como dashboard de datos públicos.</p>
+    </div>
+  </div>
+  <div class="hbox" style="margin-top:1.1rem;">
+    El patrón es siempre el mismo: <strong>datos o modelo científico → JavaScript → Canvas → bloque HTML de WordPress</strong>. No necesitas ser matemático. Necesitas saber que el bloque HTML existe.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S13  CIERRE
+════════════════════════════════════════════ -->
+<div class="slide cover" id="s13">
+  <div class="tag">Conclusión</div>
+  <h1>WordPress es la mejor<br>plataforma de divulgación<br>científica que existe</h1>
+  <p class="lead" style="margin-top:.8rem;">Gratuita, abierta, con millones de instalaciones y un bloque HTML que ejecuta cualquier simulación del mundo.</p>
+  <div style="display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1.4rem;">
+    <span class="pill wp">🌐 Bloque HTML + Canvas + JS</span>
+    <span class="pill grn">🔭 James Webb, misiones reales</span>
+    <span class="pill pnk">🆓 Sin plugins de pago</span>
+    <span class="pill org">♾️ Cualquier disciplina científica</span>
+  </div>
+  <div class="hbox">
+    <strong>El código fuente de esta presentación y la simulación están disponibles.</strong><br>
+    Cualquier pregunta, encantado.
+  </div>
+  <div class="author" style="margin-top:1.6rem;">
+    <div class="ava">AG</div>
+    <div>
+      <div class="aname">Adrián González Naranjo</div>
+      <div class="arole">WordPress Valladolid · 20/05/2026</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═════════════════════════════════════════ SCRIPTS ═══ -->
+<script>
+// ── NAV ──
+const slides = document.querySelectorAll('.slide');
+let cur = 0;
+const total = slides.length;
+function goTo(n) {
+  slides[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(n, total-1));
+  slides[cur].classList.add('active');
+  document.getElementById('pbar').style.width = ((cur+1)/total*100)+'%';
+  document.getElementById('pctr').textContent = `${cur+1} / ${total}`;
+  if(cur===3) startOrbit();
+  if(cur===6) startHill();
+  if(cur===8) startSim();
+}
+document.getElementById('np').onclick = ()=>goTo(cur+1);
+document.getElementById('pp').onclick = ()=>goTo(cur-1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') goTo(cur+1);
+  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   goTo(cur-1);
+});
+goTo(0);
+
+// ════════════════════════════════
+// CANVAS A — Órbita ilustrativa
+// ════════════════════════════════
+let oReq=null;
+function startOrbit(){
+  if(oReq) return;
+  const c=document.getElementById('co'),ctx=c.getContext('2d');
+  const W=c.width,H=c.height,cx=W/2,cy=H/2;
+  let t=0;
+  const stars=Array.from({length:65},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:Math.random()*.8+.25,a:Math.random()*.55+.25
+  }));
+  const trail=[];
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#04050d';ctx.fillRect(0,0,W,H);
+    stars.forEach(s=>{
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(200,210,255,${s.a})`;ctx.fill();
+    });
+    // moon orbit ring
+    ctx.beginPath();ctx.arc(cx,cy,68,0,Math.PI*2);
+    ctx.strokeStyle='rgba(56,88,233,.1)';ctx.lineWidth=1;ctx.stroke();
+    // moon
+    const mx=cx+68*Math.cos(t*.33),my=cy+68*Math.sin(t*.33);
+    // satellite
+    const rS=105,sa=t*.58+Math.sin(t*.2)*.65;
+    const sx=cx+rS*Math.cos(sa)*Math.cos(t*.038),sy=cy+rS*Math.sin(sa);
+    trail.push({x:sx,y:sy});
+    if(trail.length>230)trail.shift();
+    for(let i=1;i<trail.length;i++){
+      const a=i/trail.length;
+      ctx.beginPath();ctx.moveTo(trail[i-1].x,trail[i-1].y);ctx.lineTo(trail[i].x,trail[i].y);
+      ctx.strokeStyle=`rgba(240,98,146,${a*.72})`;ctx.lineWidth=1.5;ctx.stroke();
+    }
+    // earth glow
+    const eg=ctx.createRadialGradient(cx,cy,0,cx,cy,28);
+    eg.addColorStop(0,'rgba(56,88,233,.25)');eg.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);ctx.fillStyle=eg;ctx.fill();
+    // earth
+    const eg2=ctx.createRadialGradient(cx-3,cy-3,2,cx,cy,14);
+    eg2.addColorStop(0,'#6ec6f0');eg2.addColorStop(1,'#1a4a6e');
+    ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);ctx.fillStyle=eg2;ctx.fill();
+    // moon
+    ctx.beginPath();ctx.arc(mx,my,6,0,Math.PI*2);ctx.fillStyle='#9aa0b8';ctx.fill();
+    ctx.beginPath();ctx.arc(mx,my,6,0,Math.PI*2);ctx.strokeStyle='rgba(200,210,255,.2)';ctx.lineWidth=1.5;ctx.stroke();
+    // sat
+    ctx.beginPath();ctx.arc(sx,sy,4,0,Math.PI*2);
+    const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,4);
+    sg.addColorStop(0,'#ff8fa8');sg.addColorStop(1,'#f06292');
+    ctx.fillStyle=sg;ctx.fill();
+    ctx.beginPath();ctx.arc(sx,sy,7,0,Math.PI*2);
+    ctx.strokeStyle='rgba(240,98,146,.25)';ctx.lineWidth=1;ctx.stroke();
+    t+=0.027;
+    oReq=requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// ════════════════════════════════
+// CANVAS B — Regiones de Hill
+// ════════════════════════════════
+let hDone=false;
+function startHill(){
+  if(hDone)return;hDone=true;
+  const c=document.getElementById('ch'),ctx=c.getContext('2d');
+  const W=c.width,H=c.height,mu=0.012277,scale=2.3;
+  function phi(x,y){
+    const r1=Math.sqrt((x+mu)**2+y**2),r2=Math.sqrt((x-1+mu)**2+y**2);
+    if(r1<.015||r2<.015)return 99;
+    return (x**2+y**2)/2+(1-mu)/r1+mu/r2;
+  }
+  const img=ctx.createImageData(W,H);
+  const C1=3.1895,C2=3.1731,C4=2.9878;
+  for(let py=0;py<H;py++){
+    for(let px=0;px<W;px++){
+      const x=(px/W-.5)*scale*2,y=-(py/H-.5)*scale*2*(H/W);
+      const v=2*phi(x,y),i=(py*W+px)*4;
+      let r,g,b;
+      if(v>C1+.04){r=10;g=8;b=35;}
+      else if(v>C2){r=20;g=14;b=58;}
+      else if(v>C4){r=12;g=20;b=45;}
+      else{r=4;g=5;b=16;}
+      img.data[i]=r;img.data[i+1]=g;img.data[i+2]=b;img.data[i+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  function toC(x,y){return[(x/scale/2+.5)*W,(-y/scale/2*(W/H)+.5)*H];}
+  // primaries
+  const[ex,ey]=toC(-mu,0),[lx,ly]=toC(1-mu,0);
+  const eg=ctx.createRadialGradient(ex,ey,0,ex,ey,11);
+  eg.addColorStop(0,'#5ba8e0');eg.addColorStop(1,'#1a4a6e');
+  ctx.beginPath();ctx.arc(ex,ey,11,0,Math.PI*2);ctx.fillStyle=eg;ctx.fill();
+  ctx.beginPath();ctx.arc(lx,ly,5,0,Math.PI*2);ctx.fillStyle='#9aa0b8';ctx.fill();
+  // labels — bigger and more visible
+  ctx.save();
+  [{n:'L1',x:.836,y:0,c:'#f06292'},{n:'L2',x:1.156,y:0,c:'#f06292'},
+   {n:'L3',x:-1.005,y:0,c:'#f06292'},{n:'L4',x:.487,y:.866,c:'#00e5b4'},
+   {n:'L5',x:.487,y:-.866,c:'#00e5b4'}].forEach(l=>{
+    const[px,py]=toC(l.x,l.y);
+    // outer halo
+    ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);
+    ctx.strokeStyle=l.c+'66';ctx.lineWidth=2;ctx.stroke();
+    // inner dot
+    ctx.beginPath();ctx.arc(px,py,6,0,Math.PI*2);ctx.fillStyle=l.c;ctx.fill();
+    // label background pill
+    const label = l.n;
+    ctx.font='bold 12px JetBrains Mono,monospace';
+    const tw = ctx.measureText(label).width;
+    const lx2=px+16, ly2=py-6;
+    ctx.fillStyle='rgba(10,8,30,.75)';
+    ctx.beginPath();
+    ctx.roundRect(lx2-3, ly2-12, tw+8, 17, 4);
+    ctx.fill();
+    ctx.fillStyle='rgba(240,245,255,.95)';
+    ctx.fillText(label,lx2,ly2);
+  });
+  ctx.restore();
+}
+
+// ════════════════════════════════
+// CANVAS C — Simulación RK4
+// Modelo: satélite en el espacio, presets calibrados físicamente
+// C(L1)=3.18895  C(L2)=3.17267  para mu=0.012277
+// ════════════════════════════════
+let sReq=null;
+const simMu = 0.012277;
+let simTrail = [];
+let simSt    = [];
+let simCtx   = null;
+let simC     = null;
+
+const PRESETS = {
+  tierra: {
+    // Orbita circular real a r=0.30 desde la Tierra en frame rotante
+    // C=4.409 >> C(L1): zona prohibida separa completamente Tierra y Luna
+    x:0.2877, y:0.0, vx:0.0, vy:1.5145,
+    desc:'C = 4.41 >> C(L1): el satélite orbita la Tierra en una trayectoria circular. La zona prohibida le impide completamente llegar a la Luna.'
+  },
+  artemis: {
+    // C=3.187, justo entre C(L1) y C(L2): el cuello de L1 está abierto, el de L2 cerrado
+    // Genera orbita tipo halo que cruza entre Tierra y Luna
+    x:0.830, y:0.0, vx:0.050, vy:0.0,
+    desc:'C = 3.187 — entre C(L1) y C(L2): el cuello de L1 está abierto. El satélite puede cruzar entre Tierra y Luna, pero no escapar al espacio. Trayectoria tipo Artemis.'
+  },
+  webb: {
+    // Órbita alrededor de la Luna en el lado de L2 — C=2.82
+    // Simula un satélite en la zona lunar/L2, como el James Webb
+    x:1.068, y:0.0, vx:0.0, vy:-0.676,
+    desc:'Órbita alrededor de la Luna, en la zona del punto L2. El James Webb orbita exactamente en este entorno desde 2022, a 1.5 millones de km de la Tierra.'
+  },
+  caos: {
+    // Idéntico a Artemis pero y0=0.010 en lugar de 0 — diferencia mínima de posición
+    // Divergencia promedio ~0.31 visible en pocos ciclos, ambas se quedan en el sistema
+    x:0.820, y:0.010, vx:0.050, vy:0.0,
+    desc:'Diferencia de 0.010 en la posición inicial respecto a Artemis. La energía es casi idéntica, pero la trayectoria diverge completamente. Eso es el caos determinista.'
+  }
+};
+let currentPreset = 'tierra';
+
+function phi2d(x,y,mu){
+  const r1=Math.sqrt((x+mu)**2+y**2), r2=Math.sqrt((x-1+mu)**2+y**2);
+  if(r1<.008||r2<.008) return 99;
+  return (x**2+y**2)/2+(1-mu)/r1+mu/r2;
+}
+
+function updateJacobiDisplay(C0){
+  const jEl=document.getElementById('jacobi-val');
+  if(!jEl) return;
+  let regime='', color='var(--pink)';
+  if(C0>3.18895){      regime='🌍 No alcanza la Luna'; color='#7ed4f5'; }
+  else if(C0>3.17267){ regime='🌕 Cruza hacia la Luna'; color='var(--green)'; }
+  else{                regime='💫 Puede escapar al espacio'; color='var(--accent2)'; }
+  jEl.innerHTML=`<span style="color:${color};font-weight:700">C = ${C0.toFixed(4)}</span><br><span style="font-size:.75rem;color:${color};font-weight:400">${regime}</span>`;
+}
+
+function resetSim(){
+  simTrail=[];
+  const p=PRESETS[currentPreset];
+  const C0=2*phi2d(p.x,p.y,simMu)-(p.vx**2+p.vy**2);
+  simSt=[p.x,p.y,p.vx,p.vy,C0];
+  updateJacobiDisplay(C0);
+  const descEl=document.getElementById('preset-desc');
+  if(descEl) descEl.textContent=p.desc;
+}
+
+function startSim(){
+  if(sReq) return;
+  simC = document.getElementById('cs');
+  simCtx = simC.getContext('2d');
+
+  // Force canvas dimensions from layout before first frame
+  function initCanvasSize(){
+    const rect = simC.getBoundingClientRect();
+    const W = Math.floor(rect.width)  || 600;
+    const H = Math.floor(rect.height) || 420;
+    if(simC.width !== W || simC.height !== H){
+      simC.width  = W;
+      simC.height = H;
+    }
+  }
+  // Run after browser has laid out the slide
+  requestAnimationFrame(()=>{ initCanvasSize(); });
+
+  // controls wiring
+  const btnReset = document.getElementById('btn-reset');
+
+  // preset buttons — set currentPreset and resetSim
+  document.querySelectorAll('.preset-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active-preset'));
+      btn.classList.add('active-preset');
+      currentPreset = btn.dataset.preset;
+      resetSim();
+    });
+  });
+
+  btnReset.addEventListener('click', resetSim);
+  btnReset.addEventListener('mouseover',()=>{ btnReset.style.background='rgba(56,88,233,.3)'; });
+  btnReset.addEventListener('mouseout', ()=>{ btnReset.style.background='rgba(56,88,233,.15)'; });
+
+  resetSim();
+
+  const mu=simMu;
+  const CL1=3.18895, CL2=3.17267; // Jacobi values at L1 and L2 for mu=0.012277
+
+  function deriv(x,y,vx,vy){
+    const r1=Math.sqrt((x+mu)**2+y**2), r2=Math.sqrt((x-1+mu)**2+y**2);
+    if(r1<.03||r2<.02) return[vx,vy,0,0]; // inside primary — freeze, resetSim will handle
+    return[vx,vy,
+      x+2*vy-(1-mu)*(x+mu)/r1**3-mu*(x-1+mu)/r2**3,
+      y-2*vx-(1-mu)*y/r1**3-mu*y/r2**3];
+  }
+
+  function rk4(x,y,vx,vy,h){
+    const[k1x,k1y,k1vx,k1vy]=deriv(x,y,vx,vy);
+    const[k2x,k2y,k2vx,k2vy]=deriv(x+h/2*k1x,y+h/2*k1y,vx+h/2*k1vx,vy+h/2*k1vy);
+    const[k3x,k3y,k3vx,k3vy]=deriv(x+h/2*k2x,y+h/2*k2y,vx+h/2*k2vx,vy+h/2*k2vy);
+    const[k4x,k4y,k4vx,k4vy]=deriv(x+h*k3x,y+h*k3y,vx+h*k3vx,vy+h*k3vy);
+    return[x+h/6*(k1x+2*k2x+2*k3x+k4x),y+h/6*(k1y+2*k2y+2*k3y+k4y),
+           vx+h/6*(k1vx+2*k2vx+2*k3vx+k4vx),vy+h/6*(k1vy+2*k2vy+2*k3vy+k4vy)];
+  }
+
+  // Jacobi correction: applied ONCE per frame, not per substep.
+  // Gently rescales |v| to recover C0 if RK4 has drifted.
+  // Only corrects if drift > threshold to avoid over-correcting near turning points.
+  function correctJacobi(x,y,vx,vy,C0){
+    const phi=phi2d(x,y,mu);
+    if(phi>=99) return[x,y,vx,vy];
+    const v2target=2*phi-C0;
+    if(v2target<1e-8) return[x,y,vx,vy]; // at turning point — don't touch
+    const v2current=vx**2+vy**2;
+    if(v2current<1e-12) return[x,y,vx,vy];
+    const drift=Math.abs(v2current-v2target)/v2target;
+    if(drift<1e-6) return[x,y,vx,vy]; // drift negligible — skip
+    const s=Math.sqrt(v2target/v2current);
+    return[x,y,vx*s,vy*s];
+  }
+
+  // precompute Hill zones at 4px resolution into offscreen canvas
+  // Three zones: deep forbidden (C>CL1), neck zone (CL2<C<CL1), accessible (C<CL2)
+  const CL1h=3.18895, CL2h=3.17267;
+  let hillCanvas=null;
+  function buildHill(W,H){
+    hillCanvas=document.createElement('canvas');
+    hillCanvas.width=W; hillCanvas.height=H;
+    const hctx=hillCanvas.getContext('2d');
+    const img=hctx.createImageData(W,H);
+    const sz=3;
+    const S = Math.min(W,H) * 0.30;
+    const cx = W*0.42, cy = H*0.50;
+    for(let py=0;py<H;py+=sz) for(let px=0;px<W;px+=sz){
+      const wx=(px-cx)/S, wy=-(py-cy)/S;
+      const r1=Math.sqrt((wx+mu)**2+wy**2), r2=Math.sqrt((wx-1+mu)**2+wy**2);
+      let r=0,g=0,b=0,a=0;
+      if(r1>.015&&r2>.015){
+        const C=2*((wx**2+wy**2)/2+(1-mu)/r1+mu/r2);
+        if(C>CL1h){          // deep forbidden — dark purple, fully opaque
+          r=22;g=10;b=62;a=220;
+        } else if(C>CL2h){   // neck zone (between L1 and L2) — slightly lighter
+          r=14;g=6;b=40;a=160;
+        }
+        // accessible: transparent (background shows through)
+      }
+      if(a>0){
+        for(let dy=0;dy<sz&&py+dy<H;dy++) for(let dx=0;dx<sz&&px+dx<W;dx++){
+          const i=((py+dy)*W+(px+dx))*4;
+          img.data[i]=r;img.data[i+1]=g;img.data[i+2]=b;img.data[i+3]=a;
+        }
+      }
+    }
+    hctx.putImageData(img,0,0);
+  }
+
+  let lastW=0,lastH=0;
+  // toC converts simulation coords → canvas pixels
+  // Uses uniform scale so the system looks correct on any aspect ratio
+  // cx/cy = center offset so barycentre is slightly left of canvas centre
+  function toC(x,y,W,H){
+    const S = Math.min(W,H) * 0.30;
+    const cx = W*0.42;
+    const cy = H*0.50;
+    return [ cx + x*S, cy - y*S ];
+  }
+
+  function frame(){
+    const rect = simC.getBoundingClientRect();
+    const W = Math.floor(rect.width)  || simC.width  || 600;
+    const H = Math.floor(rect.height) || simC.height || 420;
+    if(W < 10 || H < 10){ sReq=requestAnimationFrame(frame); return; } // wait for layout
+    if(simC.width!==W||simC.height!==H){
+      simC.width=W; simC.height=H;
+      buildHill(W,H);
+      lastW=W; lastH=H;
+    }
+
+    // C0 stored at simSt[4] — set by resetSim
+    const C0 = simSt[4] || 3.18;
+
+    // Integrate: 30 substeps per frame
+    const h=0.0008, substeps=30;
+    for(let i=0;i<substeps;i++){
+      let[x,y,vx,vy]=rk4(simSt[0],simSt[1],simSt[2],simSt[3],h);
+      simSt=[x,y,vx,vy,C0];
+      simTrail.push([x,y]);
+    }
+    // Single Jacobi correction per frame
+    let[cx2,cy2,cvx,cvy]=correctJacobi(simSt[0],simSt[1],simSt[2],simSt[3],C0);
+    simSt=[cx2,cy2,cvx,cvy,C0];
+    if(simTrail.length>1400) simTrail.splice(0,simTrail.length-1400);
+
+    // Jacobi display
+    const jEl=document.getElementById('jacobi-val');
+    if(jEl){
+      let regime='';
+      if(C0>CL1)      regime='\n🌍 aislado cerca Tierra';
+      else if(C0>CL2) regime='\n🌕 alcanza la Luna';
+      else            regime='\n💫 puede escapar';
+      jEl.textContent='C = '+C0.toFixed(4)+regime;
+      jEl.style.whiteSpace='pre-line';
+    }
+
+    const ctx=simCtx;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#04050d'; ctx.fillRect(0,0,W,H);
+
+    // Hill zones
+    if(hillCanvas) ctx.drawImage(hillCanvas,0,0);
+
+    // faint grid lines
+    ctx.strokeStyle='rgba(124,109,250,.04)'; ctx.lineWidth=1;
+    const gs=W/8;
+    for(let x=0;x<W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Lagrange points — unified pass: ring + dot + label
+    const lagrangePoints = [
+      {n:'L1', x:.836,   y:0,     c:'#f06292', cl:'rgba(240,98,146,.65)'},
+      {n:'L2', x:1.156,  y:0,     c:'#f06292', cl:'rgba(240,98,146,.5)'},
+      {n:'L3', x:-1.005, y:0,     c:'#c97ab2', cl:'rgba(201,122,178,.4)'},
+      {n:'L4', x:.487,   y:.866,  c:'#00e5b4', cl:'rgba(0,229,180,.5)'},
+      {n:'L5', x:.487,   y:-.866, c:'#00e5b4', cl:'rgba(0,229,180,.5)'},
+    ];
+    const fSz = Math.max(11, Math.round(W*.018));
+    ctx.font = `700 ${fSz}px JetBrains Mono,monospace`;
+    lagrangePoints.forEach(l=>{
+      const[px,py]=toC(l.x,l.y,W,H);
+      // dashed ring
+      ctx.beginPath(); ctx.arc(px,py,16,0,Math.PI*2);
+      ctx.setLineDash([4,5]); ctx.strokeStyle=l.cl; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.setLineDash([]);
+      // solid dot
+      ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fillStyle=l.c; ctx.fill();
+      // label pill background
+      const tw=ctx.measureText(l.n).width;
+      const lx=px+20, ly=py+4;
+      ctx.fillStyle='rgba(6,5,20,.82)';
+      ctx.beginPath(); ctx.roundRect(lx-3,ly-fSz+2,tw+8,fSz+4,3); ctx.fill();
+      // label text
+      ctx.fillStyle=l.c;
+      ctx.fillText(l.n,lx,ly);
+    });
+
+    // Trail — gradient from purple to pink
+    for(let i=1;i<simTrail.length;i++){
+      const[x1,y1]=toC(simTrail[i-1][0],simTrail[i-1][1],W,H);
+      const[x2,y2]=toC(simTrail[i][0],simTrail[i][1],W,H);
+      const a=i/simTrail.length;
+      // color interpolation: accent→pink
+      const r=Math.round(124+(240-124)*a), g=Math.round(109+(98-109)*a), b=Math.round(250+(146-250)*a);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle=`rgba(${r},${g},${b},${a*.85})`;
+      ctx.lineWidth=1.8+a*.5; ctx.stroke();
+    }
+
+    // Earth — emoji
+    const[ex,ey]=toC(-simMu,0,W,H);
+    const earthEm = Math.round(Math.min(W,H)*0.07);
+    ctx.font = `${earthEm}px serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🌍', ex, ey);
+
+    // Moon — emoji
+    const[lx,ly]=toC(1-simMu,0,W,H);
+    const moonEm = Math.round(Math.min(W,H)*0.045);
+    ctx.font = `${moonEm}px serif`;
+    ctx.fillText('🌕', lx, ly);
+
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+
+    // Satellite — small solid dot, no glow
+    const[sx,sy]=toC(simSt[0],simSt[1],W,H);
+    const satR = Math.max(4, Math.round(Math.min(W,H)*0.012));
+    const sg=ctx.createRadialGradient(sx-satR*.25,sy-satR*.25,satR*.1,sx,sy,satR);
+    sg.addColorStop(0,'#ffb0c4'); sg.addColorStop(1,'#e0305a');
+    ctx.beginPath(); ctx.arc(sx,sy,satR,0,Math.PI*2); ctx.fillStyle=sg; ctx.fill();
+
+
+    sReq=requestAnimationFrame(frame);
+  }
+  frame();
+}
+</script>
+</body>
+</html>
