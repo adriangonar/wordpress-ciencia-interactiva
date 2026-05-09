@@ -709,6 +709,64 @@ canvas {
 </div>
 
 
+<!-- ═══════════════════════════════════════════
+     S14  PREGUNTAS
+════════════════════════════════════════════ -->
+<div class="slide" id="s14">
+  <div class="tag">Turno de preguntas</div>
+  <h2>Preguntas que podéis hacer</h2>
+  <div class="grid-2" style="margin-top:1rem;gap:1rem;">
+
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <div class="card wp" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🧱 ¿Cómo funciona el bloque HTML en WordPress?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">El bloque HTML personalizado ejecuta cualquier código HTML, CSS y JavaScript directamente en el navegador del lector. WordPress no lo procesa — lo sirve tal cual.</p>
+      </div>
+      <div class="card wp" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🐘 ¿Necesito PHP para hacer esto?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">No. Todo lo que hemos visto es HTML, CSS y JavaScript puro. PHP solo entra si queréis crear un plugin o guardar datos en la base de datos. Para publicar simulaciones, no hace falta.</p>
+      </div>
+      <div class="card wp" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">⚡ ¿Afecta al rendimiento de la página?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">El script es pequeño y sin dependencias externas. La simulación usa requestAnimationFrame y no bloquea el hilo principal. El impacto en el tiempo de carga es mínimo.</p>
+      </div>
+      <div class="card wp" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">📱 ¿Funciona en móvil?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">Sí. Canvas y requestAnimationFrame son estándar en todos los navegadores móviles modernos. Esta presentación funciona en móvil ahora mismo.</p>
+      </div>
+      <div class="card wp" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🔒 ¿Es seguro poner JavaScript en el bloque HTML?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">El JavaScript corre en el navegador del lector, no en el servidor. No accede a la base de datos ni al backend. El riesgo es idéntico al de cualquier plugin o tema que ya tenéis.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <div class="card grn" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🤔 ¿Por qué WordPress y no una web estática?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">WordPress os da gestión de contenido, SEO, comentarios, usuarios y API REST sin esfuerzo extra. La simulación interactiva vive dentro de todo ese ecosistema ya construido.</p>
+      </div>
+      <div class="card grn" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🤔 ¿Por qué no usar un plugin de visualización?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">Los plugins de visualización están limitados a tipos de gráficas predefinidos — barras, líneas, tartas. El bloque HTML ejecuta cualquier código. No hay comparación en flexibilidad.</p>
+      </div>
+      <div class="card grn" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🤔 ¿Por qué este tema científico y no otro?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">El Problema de los Tres Cuerpos tiene tres ventajas: es visualmente impactante, conecta con misiones reales que el lector conoce (Webb, Artemis), y demuestra el caos de forma inmediata e intuitiva.</p>
+      </div>
+      <div class="card grn" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🌐 ¿Las APIs de la NASA son gratuitas?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">Sí. api.nasa.gov tiene APIs públicas y gratuitas: posición de satélites (JPL Horizons), imagen del día (APOD), asteroides cercanos, clima espacial. Se consumen desde JavaScript sin backend.</p>
+      </div>
+      <div class="card grn" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.82rem;">🎓 ¿Necesito saber matemáticas para replicar esto?</h3>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:.3rem;">No. El código es copiable y comentado. Lo que necesitáis es el contexto narrativo — saber qué demuestra cada escenario — que es lo que os lleváis de esta charla.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 <!-- ═════════════════════════════════════════ SCRIPTS ═══ -->
 <script>
 // ── NAV ──
@@ -721,6 +779,8 @@ function goTo(n) {
   slides[cur].classList.add('active');
   document.getElementById('pbar').style.width = ((cur+1)/total*100)+'%';
   document.getElementById('pctr').textContent = `${cur+1} / ${total}`;
+  document.getElementById('pp').style.visibility = cur === 0 ? 'hidden' : 'visible';
+  document.getElementById('np').style.visibility = cur === total-1 ? 'hidden' : 'visible';
   if(cur===3) startOrbit();
   if(cur===6) startHill();
   if(cur===8) startSim();
