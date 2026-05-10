@@ -495,8 +495,8 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S8  EL CÓDIGO — FOCO EN JS/WP
 ════════════════════════════════════════════ -->
-<div class="slide" id="s8">
-  <div class="tag">El núcleo técnico</div>
+<div class="slide" id="s9">
+  <div class="tag">El núcleo técnico · así está hecho</div>
   <h2>30 líneas de JavaScript<br>= física espacial en WordPress</h2>
   <div class="col2e">
     <div>
@@ -538,10 +538,10 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S9  DEMO EN VIVO
 ════════════════════════════════════════════ -->
-<div class="slide" id="s9" style="padding:1.4rem 2rem;">
+<div class="slide" id="s8" style="padding:1.4rem 2rem;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;flex-wrap:wrap;gap:.6rem;">
     <div>
-      <div class="tag" style="margin-bottom:.2rem;">Demo en vivo</div>
+      <div class="tag" style="margin-bottom:.2rem;">Demo en vivo · antes del código</div>
       <h2 style="font-size:1.7rem;margin-bottom:0;">La simulación en vivo</h2>
     </div>
     <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
@@ -677,15 +677,42 @@ canvas {
     </div>
   </div>
   <div class="hbox" style="margin-top:1.1rem;">
-    El patrón es siempre el mismo: <strong>datos o modelo científico → JavaScript → Canvas → bloque HTML de WordPress</strong>. No necesitas ser matemático. Necesitas saber que el bloque HTML existe.
+    El patrón es siempre el mismo: <strong>datos o modelo científico → JavaScript → Canvas → bloque HTML de WordPress</strong>. No necesitas ser matemático. Necesitas saber que el bloque HTML existe.<br><br>
+    <span style="color:var(--green);">Y el impacto va más allá del código:</span> esto abre puertas a <strong>educación abierta, investigación reproducible y ciencia accesible</strong> sin depender de plataformas cerradas. Cualquiera con WordPress puede publicar ciencia real.
   </div>
 </div>
 
 
 <!-- ═══════════════════════════════════════════
-     S13  CIERRE
+     S13  DEMO 2: EPIDEMIOLOGÍA (SIR)
 ════════════════════════════════════════════ -->
-<div class="slide cover" id="s13">
+<div class="slide" id="s13">
+  <div class="tag">Otro campo, mismo patrón</div>
+  <h2>Modelo epidemiológico SIR<br><span style="font-size:1.1rem;font-weight:400;color:var(--muted);">también en WordPress, también sin plugins</span></h2>
+  <div style="display:flex;gap:1.5rem;align-items:flex-start;margin-top:1rem;">
+    <canvas id="cs-epi" width="520" height="300" style="flex:1;min-width:0;border-radius:12px;border:1px solid rgba(124,109,250,.18);background:#04050d;"></canvas>
+    <div style="width:220px;display:flex;flex-direction:column;gap:.8rem;">
+      <div class="card wp" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.85rem;">📊 ¿Qué es el modelo SIR?</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:.3rem;">Divide la población en <strong style="color:#7ed4f5;">Susceptibles</strong>, <strong style="color:#f06292;">Infectados</strong> y <strong style="color:#00e5b4;">Recuperados</strong>. Dos ecuaciones diferenciales. Mismo JavaScript que la simulación espacial.</p>
+      </div>
+      <div class="card grn" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.85rem;">🔁 Mismo patrón</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:.3rem;">Canvas + requestAnimationFrame + bloque HTML de WordPress. Biología, física, epidemiología — la herramienta no cambia.</p>
+      </div>
+      <div class="card pnk" style="padding:.9rem 1rem;">
+        <h3 style="font-size:.85rem;">🌐 Impacto real</h3>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:.3rem;">Durante la pandemia, este tipo de visualizaciones ayudó a millones de personas a entender el R0 y el aplanamiento de la curva. WordPress podría haberlo publicado.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     S14  CIERRE
+════════════════════════════════════════════ -->
+<div class="slide cover" id="s14">
   <div class="tag">Conclusión</div>
   <h1>WordPress como<br>laboratorio<br>científico</h1>
   <p class="lead" style="margin-top:.8rem;">Gratuita, abierta, con millones de instalaciones y un bloque HTML que ejecuta cualquier simulación del mundo.</p>
@@ -695,16 +722,9 @@ canvas {
     <span class="pill pnk">🆓 Sin plugins de pago</span>
     <span class="pill org">♾️ Cualquier disciplina científica</span>
   </div>
-  <div class="hbox">
-    <strong>El código fuente de esta presentación y la simulación están disponibles.</strong><br>
-    Cualquier pregunta, encantado.
-  </div>
-  <div class="author" style="margin-top:1.6rem;">
-    <div class="ava">AG</div>
-    <div>
-      <div class="aname">Adrián González Naranjo</div>
-      <div class="arole">WordPress Valladolid · 20/05/2026</div>
-    </div>
+  <div class="hbox" style="font-size:1.05rem;text-align:center;padding:1.1rem 1.5rem;">
+    <strong>Publica tu propia simulación científica en WordPress.</strong><br>
+    <span style="color:var(--green);">Cero plugins. Solo conocimiento.</span>
   </div>
 </div>
 
@@ -715,7 +735,7 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S14  PREGUNTAS — WordPress y técnico
 ════════════════════════════════════════════ -->
-<div class="slide" id="s14">
+<div class="slide" id="s15">
   <div class="tag">Turno de preguntas · 1 / 2</div>
   <h2>Preguntas sobre WordPress</h2>
   <div class="grid-2" style="margin-top:1.2rem;gap:1.1rem;">
@@ -756,7 +776,7 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S15  PREGUNTAS — Contenido y ciencia
 ════════════════════════════════════════════ -->
-<div class="slide" id="s15">
+<div class="slide" id="s16">
   <div class="tag">Turno de preguntas · 2 / 2</div>
   <h2>Preguntas sobre el contenido</h2>
   <div class="grid-2" style="margin-top:1.2rem;gap:1.1rem;">
@@ -811,7 +831,8 @@ function goTo(n) {
   document.getElementById('np').style.visibility = cur === total-1 ? 'hidden' : 'visible';
   if(cur===3) startOrbit();
   if(cur===6) startHill();
-  if(cur===8) startSim();
+  if(cur===7) startSim();
+  if(cur===12) startEpi();
 }
 document.getElementById('np').onclick = ()=>goTo(cur+1);
 document.getElementById('pp').onclick = ()=>goTo(cur-1);
@@ -1243,7 +1264,77 @@ function startSim(){
     sReq=requestAnimationFrame(frame);
   }
   frame();
+}// ════════════════════════════════
+// CANVAS EPI — Modelo SIR epidemiológico
+// S: susceptibles, I: infectados, R: recuperados
+// ════════════════════════════════
+let epiReq=null;
+function startEpi(){
+  if(epiReq) return;
+  const canvas=document.getElementById('cs-epi');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+
+  // Parámetros SIR normalizados
+  const N=1000, beta=0.3, gamma=0.05;
+  let S=999, I=1, R=0;
+  const history={S:[S],I:[I],R:[R]};
+  const maxSteps=600;
+  let step=0;
+
+  function epiFrame(){
+    if(step<maxSteps){
+      // Euler simple — suficiente para visualización
+      const dS=-beta*S*I/N;
+      const dI= beta*S*I/N - gamma*I;
+      const dR= gamma*I;
+      S=Math.max(0,S+dS); I=Math.max(0,I+dI); R=Math.min(N,R+dR);
+      history.S.push(S); history.I.push(I); history.R.push(R);
+      step++;
+    }
+
+    const W=canvas.offsetWidth||520, H=canvas.offsetHeight||300;
+    if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
+
+    ctx.fillStyle='#04050d'; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle='rgba(124,109,250,.06)'; ctx.lineWidth=1;
+    for(let x=0;x<W;x+=W/8){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=H/4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    const pad=30, cW=W-pad*2, cH=H-pad*2;
+    const len=history.S.length;
+
+    function drawLine(arr, color){
+      ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2.5;
+      arr.forEach((v,i)=>{
+        const x=pad+i/maxSteps*cW;
+        const y=pad+cH-(v/N)*cH;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+    }
+
+    drawLine(history.S,'#7ed4f5');   // azul — susceptibles
+    drawLine(history.I,'#f06292');   // rosa — infectados
+    drawLine(history.R,'#00e5b4');   // verde — recuperados
+
+    // leyenda
+    const font=`600 ${Math.round(W*.022)}px JetBrains Mono,monospace`;
+    ctx.font=font;
+    [['Susceptibles','#7ed4f5',Math.round(S)],
+     ['Infectados','#f06292',Math.round(I)],
+     ['Recuperados','#00e5b4',Math.round(R)]].forEach(([label,c,val],i)=>{
+      ctx.fillStyle=c;
+      ctx.fillText(`${label}: ${val}`, pad, 20+i*18);
+    });
+
+    epiReq=requestAnimationFrame(epiFrame);
+  }
+  epiFrame();
 }
+
 </script>
 </body>
 </html>
