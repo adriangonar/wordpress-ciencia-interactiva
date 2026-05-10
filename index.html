@@ -286,6 +286,23 @@ canvas {
 }
 .preset-btn:hover { background:rgba(124,109,250,.28); border-color:rgba(124,109,250,.6); }
 .preset-btn.active-preset { background:rgba(0,229,180,.15); border-color:rgba(0,229,180,.55); color:#00e5b4; }
+.epi-btn {
+  background:rgba(124,109,250,.12); border:1px solid rgba(124,109,250,.3);
+  color:rgba(196,188,255,.85); border-radius:8px; padding:.3rem .6rem;
+  font-size:.72rem; cursor:pointer; font-family:'JetBrains Mono',monospace;
+  letter-spacing:.03em; transition: all .15s ease;
+}
+.epi-btn:hover { background:rgba(124,109,250,.28); border-color:rgba(124,109,250,.6); }
+.epi-btn.active-epi { background:rgba(240,98,146,.15); border-color:rgba(240,98,146,.55); color:#f06292; }
+
+.speed-btn {
+  background:rgba(255,160,64,.1); border:1px solid rgba(255,160,64,.28);
+  color:rgba(255,200,100,.8); border-radius:7px; padding:.26rem .55rem;
+  font-size:.7rem; cursor:pointer; font-family:'JetBrains Mono',monospace;
+  letter-spacing:.05em; transition: all .15s ease;
+}
+.speed-btn:hover { background:rgba(255,160,64,.25); }
+.speed-btn.active-speed { background:rgba(255,160,64,.22); border-color:rgba(255,160,64,.6); color:#ffa040; font-weight:700; }
 </style>
 </head>
 <body>
@@ -686,23 +703,72 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S13  DEMO 2: EPIDEMIOLOGÍA (SIR)
 ════════════════════════════════════════════ -->
-<div class="slide" id="s13">
-  <div class="tag">Otro campo, mismo patrón</div>
-  <h2>Modelo epidemiológico SIR<br><span style="font-size:1.1rem;font-weight:400;color:var(--muted);">también en WordPress, también sin plugins</span></h2>
-  <div style="display:flex;gap:1.5rem;align-items:flex-start;margin-top:1rem;">
-    <canvas id="cs-epi" width="520" height="300" style="flex:1;min-width:0;border-radius:12px;border:1px solid rgba(124,109,250,.18);background:#04050d;"></canvas>
-    <div style="width:220px;display:flex;flex-direction:column;gap:.8rem;">
-      <div class="card wp" style="padding:.9rem 1rem;">
-        <h3 style="font-size:.85rem;">📊 ¿Qué es el modelo SIR?</h3>
-        <p style="font-size:.8rem;color:var(--muted);margin-top:.3rem;">Divide la población en <strong style="color:#7ed4f5;">Susceptibles</strong>, <strong style="color:#f06292;">Infectados</strong> y <strong style="color:#00e5b4;">Recuperados</strong>. Dos ecuaciones diferenciales. Mismo JavaScript que la simulación espacial.</p>
+<div class="slide" id="s13" style="padding:1.5rem 2.2rem;">
+
+  <!-- fila superior: título + botones + día + velocidad -->
+  <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-bottom:.75rem;">
+    <div style="flex-shrink:0;">
+      <div class="tag" style="margin-bottom:.15rem;">Otro campo, mismo patrón</div>
+      <h2 style="font-size:1.6rem;margin-bottom:0;">Modelo SIR — Epidemiología</h2>
+    </div>
+
+    <!-- escenario buttons -->
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.1em;white-space:nowrap;">ESCENARIO →</span>
+      <button class="epi-btn active-epi" data-epi="gripe" >🤧 Gripe</button>
+      <button class="epi-btn"            data-epi="covid" >🦠 COVID-19</button>
+      <button class="epi-btn"            data-epi="p1918" >💀 Gripe 1918</button>
+      <button class="epi-btn"            data-epi="vacuna">💉 Con vacunación</button>
+    </div>
+
+    <!-- día + velocidad + replay -->
+    <div style="margin-left:auto;display:flex;align-items:center;gap:.9rem;flex-shrink:0;">
+      <div style="text-align:center;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.1em;margin-bottom:.1rem;">DÍA</div>
+        <div id="epi-day" style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:#fff;line-height:1;min-width:3.5ch;text-align:center;">0</div>
       </div>
-      <div class="card grn" style="padding:.9rem 1rem;">
-        <h3 style="font-size:.85rem;">🔁 Mismo patrón</h3>
-        <p style="font-size:.8rem;color:var(--muted);margin-top:.3rem;">Canvas + requestAnimationFrame + bloque HTML de WordPress. Biología, física, epidemiología — la herramienta no cambia.</p>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.1em;margin-bottom:.3rem;">VELOCIDAD</div>
+        <div style="display:flex;gap:.3rem;">
+          <button class="speed-btn active-speed" data-speed="1">×1</button>
+          <button class="speed-btn"              data-speed="3">×3</button>
+          <button class="speed-btn"              data-speed="8">×8</button>
+        </div>
       </div>
-      <div class="card pnk" style="padding:.9rem 1rem;">
-        <h3 style="font-size:.85rem;">🌐 Impacto real</h3>
-        <p style="font-size:.8rem;color:var(--muted);margin-top:.3rem;">Durante la pandemia, este tipo de visualizaciones ayudó a millones de personas a entender el R0 y el aplanamiento de la curva. WordPress podría haberlo publicado.</p>
+      <button id="epi-replay" style="background:rgba(56,88,233,.15);border:1px solid rgba(56,88,233,.4);color:rgba(150,168,255,.9);border-radius:8px;padding:.38rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;cursor:pointer;letter-spacing:.06em;transition:background .15s;align-self:flex-end;">↺ Replay</button>
+    </div>
+  </div>
+
+  <!-- canvas + panel -->
+  <div style="display:flex;gap:1.1rem;height:calc(100% - 6.5rem);">
+    <canvas id="cs-epi" style="flex:1;min-width:0;width:0;height:100%;display:block;border-radius:13px;border:1px solid rgba(124,109,250,.18);background:#04050d;box-shadow:0 0 40px rgba(124,109,250,.08);"></canvas>
+
+    <!-- panel lateral -->
+    <div style="width:205px;display:flex;flex-direction:column;gap:.65rem;justify-content:center;">
+      <div class="card wp" style="padding:.85rem .95rem;">
+        <h3 style="font-size:.82rem;">📊 Escenario</h3>
+        <p id="epi-desc" style="font-size:.77rem;color:var(--muted);margin-top:.35rem;line-height:1.55;">Gripe estacional: R₀ ≈ 1.3. Pico moderado, la mayoría se recupera sin saturar el sistema sanitario.</p>
+      </div>
+      <div class="card" style="padding:.85rem .95rem;border-color:rgba(255,255,255,.07);">
+        <h3 style="font-size:.82rem;color:var(--muted);">Población ahora</h3>
+        <div style="margin-top:.5rem;display:flex;flex-direction:column;gap:.35rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:.76rem;color:#7ed4f5;font-family:'JetBrains Mono',monospace;">🔵 Susceptibles</span>
+            <span id="stat-s" style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:#7ed4f5;">999</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:.76rem;color:#f06292;font-family:'JetBrains Mono',monospace;">🔴 Infectados</span>
+            <span id="stat-i" style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:#f06292;">1</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:.76rem;color:#00e5b4;font-family:'JetBrains Mono',monospace;">🟢 Recuperados</span>
+            <span id="stat-r" style="font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;color:#00e5b4;">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="card grn" style="padding:.85rem .95rem;">
+        <h3 style="font-size:.82rem;">🔁 Mismo patrón</h3>
+        <p style="font-size:.77rem;color:var(--muted);margin-top:.3rem;line-height:1.5;">Canvas + requestAnimationFrame + bloque HTML. La herramienta no cambia, cambia el modelo.</p>
       </div>
     </div>
   </div>
@@ -1265,75 +1331,292 @@ function startSim(){
   }
   frame();
 }// ════════════════════════════════
-// CANVAS EPI — Modelo SIR epidemiológico
-// S: susceptibles, I: infectados, R: recuperados
 // ════════════════════════════════
-let epiReq=null;
-function startEpi(){
-  if(epiReq) return;
-  const canvas=document.getElementById('cs-epi');
+// CANVAS EPI — Modelo SIR · escenarios + velocidad
+// ════════════════════════════════
+const EPI_SCENARIOS = {
+  gripe: {
+    beta:0.26, gamma:0.20, N:1000, I0:5,
+    label:'Gripe estacional · R₀ ≈ 1.3',
+    desc:'Gripe estacional: R₀ ≈ 1.3. Pico moderado y tardío, la mayoría se recupera sin saturar el sistema sanitario.'
+  },
+  covid: {
+    beta:0.50, gamma:0.10, N:1000, I0:3,
+    label:'COVID-19 · R₀ ≈ 5',
+    desc:'COVID-19 sin medidas: R₀ ≈ 5. Pico alto y rápido. La mayoría de la población infectada antes de que llegue la inmunidad de grupo.'
+  },
+  p1918: {
+    beta:0.80, gamma:0.10, N:1000, I0:1,
+    label:'Gripe 1918 · R₀ ≈ 8',
+    desc:'Gripe española 1918: R₀ estimado ≈ 8. Curva casi vertical. Sin vacunas ni tratamientos, el sistema sanitario colapsa inmediatamente.'
+  },
+  vacuna: {
+    beta:0.50, gamma:0.10, N:1000, I0:3, vacRate:0.60,
+    label:'COVID-19 + 60% vacunado',
+    desc:'El mismo COVID-19 pero con el 60% vacunado desde el inicio. El pico cae drásticamente. Eso es la inmunidad de grupo en acción.'
+  }
+};
+
+let epiReq = null;
+let epiScenario = 'gripe';
+let epiSpeed = 1;       // días por frame
+let epiAnimDay = 0;     // día actual en la animación
+let epiData = null;     // {hS, hI, hR, totalDays, N, peakDay, peakI}
+
+function runSIR(cfg) {
+  const { beta, gamma, N, I0, vacRate=0 } = cfg;
+  const immune = Math.floor(N * vacRate);
+  let S = N - I0 - immune, I = I0, R = immune;
+  const hS=[S], hI=[I], hR=[R];
+  // run until I < 0.5 or 500 days max
+  let totalDays = 0;
+  let peakI = I, peakDay = 0;
+  for(let d = 0; d < 500; d++){
+    const dS = -beta * S * I / N;
+    const dI =  beta * S * I / N - gamma * I;
+    const dR =  gamma * I;
+    S = Math.max(0, S + dS);
+    I = Math.max(0, I + dI);
+    R = Math.min(N, R + dR);
+    hS.push(S); hI.push(I); hR.push(R);
+    if(I > peakI){ peakI = I; peakDay = d+1; }
+    totalDays = d + 1;
+    if(I < 0.5) break;
+  }
+  return { hS, hI, hR, totalDays, N, peakDay, peakI };
+}
+
+function startEpi() {
+  if(epiReq){ cancelAnimationFrame(epiReq); epiReq = null; }
+  const canvas = document.getElementById('cs-epi');
   if(!canvas) return;
-  const ctx=canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
 
-  // Parámetros SIR normalizados
-  const N=1000, beta=0.3, gamma=0.05;
-  let S=999, I=1, R=0;
-  const history={S:[S],I:[I],R:[R]};
-  const maxSteps=600;
-  let step=0;
+  // wire controls once
+  if(!startEpi._wired){
+    startEpi._wired = true;
 
-  function epiFrame(){
-    if(step<maxSteps){
-      // Euler simple — suficiente para visualización
-      const dS=-beta*S*I/N;
-      const dI= beta*S*I/N - gamma*I;
-      const dR= gamma*I;
-      S=Math.max(0,S+dS); I=Math.max(0,I+dI); R=Math.min(N,R+dR);
-      history.S.push(S); history.I.push(I); history.R.push(R);
-      step++;
-    }
-
-    const W=canvas.offsetWidth||520, H=canvas.offsetHeight||300;
-    if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
-
-    ctx.fillStyle='#04050d'; ctx.fillRect(0,0,W,H);
-
-    // grid
-    ctx.strokeStyle='rgba(124,109,250,.06)'; ctx.lineWidth=1;
-    for(let x=0;x<W;x+=W/8){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(let y=0;y<H;y+=H/4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
-    const pad=30, cW=W-pad*2, cH=H-pad*2;
-    const len=history.S.length;
-
-    function drawLine(arr, color){
-      ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2.5;
-      arr.forEach((v,i)=>{
-        const x=pad+i/maxSteps*cW;
-        const y=pad+cH-(v/N)*cH;
-        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    document.querySelectorAll('.epi-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.epi-btn').forEach(b=>b.classList.remove('active-epi'));
+        btn.classList.add('active-epi');
+        epiScenario = btn.dataset.epi;
+        const desc = document.getElementById('epi-desc');
+        if(desc) desc.textContent = EPI_SCENARIOS[epiScenario].desc;
+        epiAnimDay = 0;
+        epiData = runSIR(EPI_SCENARIOS[epiScenario]);
+        if(epiReq){ cancelAnimationFrame(epiReq); epiReq=null; }
+        startEpi();
       });
-      ctx.stroke();
-    }
-
-    drawLine(history.S,'#7ed4f5');   // azul — susceptibles
-    drawLine(history.I,'#f06292');   // rosa — infectados
-    drawLine(history.R,'#00e5b4');   // verde — recuperados
-
-    // leyenda
-    const font=`600 ${Math.round(W*.022)}px JetBrains Mono,monospace`;
-    ctx.font=font;
-    [['Susceptibles','#7ed4f5',Math.round(S)],
-     ['Infectados','#f06292',Math.round(I)],
-     ['Recuperados','#00e5b4',Math.round(R)]].forEach(([label,c,val],i)=>{
-      ctx.fillStyle=c;
-      ctx.fillText(`${label}: ${val}`, pad, 20+i*18);
     });
 
-    epiReq=requestAnimationFrame(epiFrame);
+    document.querySelectorAll('.speed-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active-speed'));
+        btn.classList.add('active-speed');
+        epiSpeed = parseInt(btn.dataset.speed);
+      });
+    });
+
+    const replay = document.getElementById('epi-replay');
+    if(replay){
+      replay.addEventListener('click',()=>{
+        epiAnimDay = 0;
+        epiData = runSIR(EPI_SCENARIOS[epiScenario]);
+        if(epiReq){ cancelAnimationFrame(epiReq); epiReq=null; }
+        startEpi();
+      });
+      replay.addEventListener('mouseover',()=>{ replay.style.background='rgba(56,88,233,.3)'; });
+      replay.addEventListener('mouseout', ()=>{ replay.style.background='rgba(56,88,233,.15)'; });
+    }
+  }
+
+  // compute data for current scenario
+  epiData = runSIR(EPI_SCENARIOS[epiScenario]);
+
+  function epiFrame(){
+    // advance animation
+    epiAnimDay = Math.min(epiAnimDay + epiSpeed, epiData.totalDays);
+
+    // sync canvas size
+    const W = canvas.offsetWidth  || 600;
+    const H = canvas.offsetHeight || 340;
+    if(canvas.width !== W || canvas.height !== H){ canvas.width=W; canvas.height=H; }
+
+    const { hS, hI, hR, totalDays, N, peakDay, peakI } = epiData;
+    const day = Math.round(epiAnimDay);
+
+    // update DOM counters
+    const dayEl = document.getElementById('epi-day');
+    if(dayEl) dayEl.textContent = day;
+    const sEl=document.getElementById('stat-s'), iEl=document.getElementById('stat-i'), rEl=document.getElementById('stat-r');
+    if(sEl) sEl.textContent = Math.round(hS[day]||0);
+    if(iEl) iEl.textContent = Math.round(hI[day]||0);
+    if(rEl) rEl.textContent = Math.round(hR[day]||0);
+
+    // ── DRAW ──
+    ctx.fillStyle='#04050d'; ctx.fillRect(0,0,W,H);
+
+    const pad = { top:38, right:24, bottom:48, left:54 };
+    const cW = W - pad.left - pad.right;
+    const cH = H - pad.top  - pad.bottom;
+
+    // CLIP to chart area — nothing ever escapes
+    ctx.save();
+    ctx.beginPath(); ctx.rect(pad.left, pad.top, cW, cH); ctx.clip();
+
+    // grid
+    ctx.strokeStyle='rgba(124,109,250,.07)'; ctx.lineWidth=1;
+    [0,.25,.5,.75,1].forEach(f=>{
+      const y = pad.top + cH*(1-f);
+      ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cW,y); ctx.stroke();
+    });
+    // vertical day markers every ~10% of totalDays
+    const xTicks = 5;
+    for(let i=0;i<=xTicks;i++){
+      const x = pad.left + (i/xTicks)*cW;
+      ctx.beginPath(); ctx.moveTo(x,pad.top); ctx.lineTo(x,pad.top+cH); ctx.stroke();
+    }
+
+    // area fills
+    const drawArea = (arr, color) => {
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top+cH);
+      for(let d=0;d<=day;d++){
+        const x = pad.left + (d/totalDays)*cW;
+        const y = pad.top  + cH*(1 - arr[d]/N);
+        d===0 ? ctx.lineTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.lineTo(pad.left+(day/totalDays)*cW, pad.top+cH);
+      ctx.closePath();
+      ctx.fillStyle=color; ctx.fill();
+    };
+    drawArea(hS,'rgba(126,212,245,.04)');
+    drawArea(hI,'rgba(240,98,146,.06)');
+    drawArea(hR,'rgba(0,229,180,.04)');
+
+    // lines
+    const drawLine = (arr, color, lw=2.5) => {
+      ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw;
+      ctx.lineJoin='round'; ctx.lineCap='round';
+      for(let d=0;d<=day;d++){
+        const x = pad.left + (d/totalDays)*cW;
+        const y = pad.top  + cH*(1 - arr[d]/N);
+        d===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    };
+    drawLine(hS,'#7ed4f5', 2.5);
+    drawLine(hI,'#f06292', 3.0);
+    drawLine(hR,'#00e5b4', 2.5);
+
+    // peak marker — only once we've passed it
+    if(day >= peakDay){
+      const px = pad.left + (peakDay/totalDays)*cW;
+      const py = pad.top  + cH*(1 - peakI/N);
+      // vertical dashed line
+      ctx.setLineDash([4,5]);
+      ctx.strokeStyle='rgba(240,98,146,.45)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(px,pad.top); ctx.lineTo(px,pad.top+cH); ctx.stroke();
+      ctx.setLineDash([]);
+      // dot on peak
+      ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle='#f06292'; ctx.fill();
+      // label
+      const pLabel = `Pico día ${peakDay}: ${Math.round(peakI)}`;
+      const fPk = Math.max(10, Math.round(W*.016));
+      ctx.font = `600 ${fPk}px JetBrains Mono,monospace`;
+      const tw = ctx.measureText(pLabel).width;
+      const lx = Math.min(px+8, pad.left+cW-tw-4);
+      const ly = Math.max(pad.top+14, py-10);
+      ctx.fillStyle='rgba(6,5,20,.8)';
+      ctx.beginPath(); ctx.roundRect(lx-3, ly-fPk+2, tw+7, fPk+5, 3); ctx.fill();
+      ctx.fillStyle='#f06292'; ctx.fillText(pLabel, lx, ly);
+    }
+
+    // progress cursor line
+    if(day < totalDays){
+      const cx2 = pad.left+(day/totalDays)*cW;
+      ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.lineWidth=1;
+      ctx.setLineDash([3,5]);
+      ctx.beginPath(); ctx.moveTo(cx2,pad.top); ctx.lineTo(cx2,pad.top+cH); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.restore(); // end clip
+
+    // ── AXES ──
+    ctx.strokeStyle='rgba(200,210,255,.15)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+cH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.left,pad.top+cH); ctx.lineTo(pad.left+cW,pad.top+cH); ctx.stroke();
+
+    // Y axis labels (population %)
+    const yFnt = Math.max(9,Math.round(W*.016));
+    ctx.fillStyle='rgba(150,155,185,.6)'; ctx.font=`400 ${yFnt}px JetBrains Mono,monospace`;
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    [0,.25,.5,.75,1].forEach(f=>{
+      ctx.fillText(Math.round(f*N), pad.left-7, pad.top+cH*(1-f));
+    });
+
+    // X axis — day labels
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    for(let i=0;i<=xTicks;i++){
+      const d = Math.round((i/xTicks)*totalDays);
+      ctx.fillText(`día ${d}`, pad.left+(i/xTicks)*cW, pad.top+cH+6);
+    }
+
+    // X axis title
+    ctx.fillStyle='rgba(150,155,185,.4)'; ctx.font=`400 ${yFnt}px JetBrains Mono,monospace`;
+    ctx.fillText('días desde el inicio', pad.left+cW/2, pad.top+cH+22);
+
+    // ── LEGEND — top ──
+    const legY = pad.top - 18;
+    const legFnt = Math.max(10,Math.round(W*.018));
+    ctx.font=`600 ${legFnt}px JetBrains Mono,monospace`;
+    ctx.textBaseline='middle'; ctx.textAlign='left';
+    let legX = pad.left;
+    [
+      {label:'Susceptibles', val:Math.round(hS[day]||0), c:'#7ed4f5'},
+      {label:'Infectados',   val:Math.round(hI[day]||0), c:'#f06292'},
+      {label:'Recuperados',  val:Math.round(hR[day]||0), c:'#00e5b4'},
+    ].forEach(({label,val,c})=>{
+      ctx.beginPath(); ctx.arc(legX+5,legY,4.5,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
+      ctx.fillStyle=c;
+      const txt = `${label}: ${val}`;
+      ctx.fillText(txt, legX+14, legY);
+      legX += ctx.measureText(txt).width + 28;
+    });
+
+    // R0 top right
+    const cfg2 = EPI_SCENARIOS[epiScenario];
+    const r0 = (cfg2.beta/cfg2.gamma).toFixed(1);
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillStyle = r0>1 ? 'rgba(255,160,64,.75)' : 'rgba(0,229,180,.75)';
+    ctx.font=`700 ${Math.max(11,Math.round(W*.02))}px JetBrains Mono,monospace`;
+    ctx.fillText(`R₀ = ${r0}`, pad.left+cW, pad.top-18);
+
+    if(epiAnimDay < epiData.totalDays){
+      epiReq = requestAnimationFrame(epiFrame);
+    } else {
+      epiReq = null;
+    }
   }
   epiFrame();
 }
+
+// wire epi buttons — delegated to startEpi._wired above
+document.querySelectorAll('.epi-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.epi-btn').forEach(b=>b.classList.remove('active-epi'));
+    btn.classList.add('active-epi');
+    epiScenario=btn.dataset.epi;
+    const desc=document.getElementById('epi-desc');
+    if(desc) desc.textContent=EPI_SCENARIOS[epiScenario].desc;
+    epiAnimDay=0;
+    if(epiReq){cancelAnimationFrame(epiReq);epiReq=null;}
+    startEpi();
+  });
+});
 
 </script>
 </body>
