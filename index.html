@@ -439,7 +439,7 @@ canvas {
       <span class="ico">🔢</span>
       <h3>2 — Un solo parámetro</h3>
       <p style="font-size:.88rem;">Todo el sistema depende de <em>μ = masa_Luna / masa_total ≈ 0.0123</em>. Un número controla toda la física.</p>
-      <code class="math" style="font-size:.75rem; margin-top:.6rem;">mu = 0.012277471</code>
+      <code class="math" style="font-size:.75rem; margin-top:.6rem;">μ = 0.012277471</code>
     </div>
     <div class="card pnk">
       <span class="ico">📍</span>
@@ -503,7 +503,7 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S8  EL CÓDIGO — FOCO EN JS/WP
 ════════════════════════════════════════════ -->
-<div class="slide" id="s9">
+<div class="slide" id="s8">
   <div class="tag">El núcleo técnico · así está hecho</div>
   <h2>30 líneas de JavaScript<br>= física espacial en WordPress</h2>
   <div class="col2e">
@@ -546,7 +546,7 @@ canvas {
 <!-- ═══════════════════════════════════════════
      S9  DEMO EN VIVO
 ════════════════════════════════════════════ -->
-<div class="slide" id="s8" style="padding:1.4rem 2rem;">
+<div class="slide" id="s9" style="padding:1.4rem 2rem;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;flex-wrap:wrap;gap:.6rem;">
     <div>
       <div class="tag" style="margin-bottom:.2rem;">Demo en vivo · antes del código</div>
@@ -858,7 +858,7 @@ function goTo(n) {
   document.getElementById('np').style.visibility = cur === total-1 ? 'hidden' : 'visible';
   if(cur===3) startOrbit();
   if(cur===6) startHill();
-  if(cur===7) startSim();
+  if(cur===8) startSim();
   if(cur===12) startEpi();
 }
 document.getElementById('np').onclick = ()=>goTo(cur+1);
